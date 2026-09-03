@@ -2,14 +2,13 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { ArrowUpRight, ArrowDownRight, Flame, Medal, Layers as LayersIcon } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { usePortfolio, portfolioValueSeries } from '@/lib/store'
 import { assets } from '@/lib/data'
 import { PriceChart, AllocationDonut } from '@/components/charts'
 import { AssetToken, ChangeBadge, Panel, SectionHead } from '@/components/primitives'
 import { AssetRow } from '@/components/asset-views'
 import { formatUSD, formatSignedUSD, formatPct, formatDateShort, trendClass } from '@/lib/format'
-import { getTier, collectorScore, dayStreak } from '@/lib/gamify'
 import { cn } from '@/lib/utils'
 
 export function Overview() {
@@ -21,14 +20,11 @@ export function Overview() {
     () => new Set(positionViews.map((v) => v.asset.setName)).size,
     [positionViews],
   )
-  const tier = getTier(totals.value)
-  const streak = dayStreak(positionViews.length)
-  const score = collectorScore({
-    value: totals.value,
-    positions: positionViews.length,
-    setsTracked,
-    streak,
-  })
+  const singlesCount = useMemo(
+    () => positionViews.filter((v) => v.asset.type === 'card').length,
+    [positionViews],
+  )
+  const sealedCount = positionViews.length - singlesCount
 
   const topPerformers = useMemo(
     () => [...positionViews].sort((a, b) => b.returnPct - a.returnPct).slice(0, 3),
@@ -72,14 +68,11 @@ export function Overview() {
         <Panel className="lg:col-span-2" padded={false}>
           <div className="flex flex-wrap items-start justify-between gap-4 p-4 pb-0 sm:p-5 sm:pb-0">
             <div>
-              <div className="flex items-center gap-2">
-                <TierChip name={tier.current.name} />
-                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Collection value
-                </span>
-              </div>
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Collection value
+              </span>
               <div className="mt-2 flex items-baseline gap-3">
-                <span className="tabular text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                <span className="tabular text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                   {formatUSD(totals.value, { cents: true })}
                 </span>
                 <ChangeBadge value={totals.totalReturnPct} size="md" />
@@ -89,7 +82,6 @@ export function Overview() {
                 <span className="text-muted-foreground"> · {formatPct(totals.todayMovePct)}</span>
               </p>
             </div>
-            <StreakPill days={streak} />
           </div>
           <PriceChart history={series} className="px-2 pb-2 pt-2 sm:px-3" height={240} defaultRange="3M" />
           <div className="grid grid-cols-2 gap-4 border-t border-border p-4 sm:grid-cols-4 sm:p-5">
@@ -108,16 +100,8 @@ export function Overview() {
           </div>
         </Panel>
 
-        {/* Collector status + allocation */}
+        {/* Allocation + composition */}
         <div className="grid gap-5">
-          <CollectorStatus
-            tier={tier}
-            score={score}
-            streak={streak}
-            setsTracked={setsTracked}
-            holdings={positionViews.length}
-          />
-
           <Panel>
             <SectionHead title="Allocation" action="Portfolio" href="/portfolio" />
             <div className="flex items-center gap-4">
@@ -136,6 +120,11 @@ export function Overview() {
                   value={totals.sealedValue}
                 />
               </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-border bg-border">
+              <CompCell label="Singles" value={String(singlesCount)} />
+              <CompCell label="Sealed" value={String(sealedCount)} />
+              <CompCell label="Sets" value={String(setsTracked)} />
             </div>
           </Panel>
         </div>
@@ -212,111 +201,20 @@ export function Overview() {
   )
 }
 
-function TierChip({ name }: { name: string }) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-warning-muted px-2 py-0.5 text-[11px] font-bold text-warning">
-      <Medal className="size-3" strokeWidth={2.4} />
-      {name}
-    </span>
-  )
-}
-
-function StreakPill({ days }: { days: number }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card-elevated px-2.5 py-1.5">
-      <Flame className="size-4 text-warning" strokeWidth={2.4} />
-      <span className="tabular text-sm font-bold text-foreground">{days}</span>
-      <span className="text-xs font-medium text-muted-foreground">day streak</span>
-    </span>
-  )
-}
-
 function HeroStat({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className={cn('tabular mt-0.5 text-lg font-bold text-foreground', valueClass)}>{value}</p>
+      <p className={cn('tabular mt-0.5 text-lg font-semibold text-foreground', valueClass)}>{value}</p>
     </div>
   )
 }
 
-function CollectorStatus({
-  tier,
-  score,
-  streak,
-  setsTracked,
-  holdings,
-}: {
-  tier: ReturnType<typeof getTier>
-  score: number
-  streak: number
-  setsTracked: number
-  holdings: number
-}) {
+function CompCell({ label, value }: { label: string; value: string }) {
   return (
-    <Panel>
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-warning-muted text-warning">
-            <Medal className="size-6" strokeWidth={2} />
-          </span>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Collector rank
-            </p>
-            <p className="text-lg font-bold leading-tight text-foreground">{tier.current.name}</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Score</p>
-          <p className="tabular text-lg font-bold leading-tight text-primary">{score.toLocaleString()}</p>
-        </div>
-      </div>
-
-      {tier.next ? (
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-foreground">
-              {Math.round(tier.progress * 100)}% to {tier.next.name}
-            </span>
-            <span className="tabular text-muted-foreground">{formatUSD(tier.toNext)} to go</span>
-          </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
-            <div
-              className="h-full rounded-full bg-primary transition-[width] duration-500"
-              style={{ width: `${Math.max(4, tier.progress * 100)}%` }}
-            />
-          </div>
-        </div>
-      ) : (
-        <p className="mt-4 text-xs font-semibold text-primary">Top tier reached — Master collector</p>
-      )}
-
-      <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-4">
-        <MiniStat icon={Flame} label="Day streak" value={String(streak)} accent />
-        <MiniStat icon={LayersIcon} label="Sets" value={String(setsTracked)} />
-        <MiniStat icon={Medal} label="Holdings" value={String(holdings)} />
-      </div>
-    </Panel>
-  )
-}
-
-function MiniStat({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: typeof Flame
-  label: string
-  value: string
-  accent?: boolean
-}) {
-  return (
-    <div className="flex flex-col items-center gap-1 rounded-xl bg-secondary/50 py-2.5">
-      <Icon className={cn('size-4', accent ? 'text-warning' : 'text-muted-foreground')} strokeWidth={2.2} />
-      <span className="tabular text-sm font-bold text-foreground">{value}</span>
-      <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+    <div className="flex flex-col items-center gap-0.5 bg-card py-3">
+      <span className="tabular text-lg font-semibold text-foreground">{value}</span>
+      <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
     </div>
   )
 }

@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-sans-family), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-family), ui-monospace, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -57,55 +57,58 @@
   color-scheme: dark;
   --radius: 0.875rem;
 
-  --background: oklch(0.16 0.012 264);
-  --foreground: oklch(0.97 0.004 264);
+  /* Deep graphite base — low neutral chroma for a refined, non-"blue-gray SaaS" feel */
+  --background: oklch(0.145 0.006 258);
+  --foreground: oklch(0.975 0.004 258);
 
-  --card: oklch(0.196 0.014 264);
-  --card-foreground: oklch(0.97 0.004 264);
-  --card-elevated: oklch(0.225 0.016 264);
+  --card: oklch(0.184 0.007 258);
+  --card-foreground: oklch(0.975 0.004 258);
+  --card-elevated: oklch(0.219 0.008 258);
 
-  --popover: oklch(0.21 0.015 264);
-  --popover-foreground: oklch(0.97 0.004 264);
+  --popover: oklch(0.2 0.008 258);
+  --popover-foreground: oklch(0.975 0.004 258);
 
-  --primary: oklch(0.62 0.187 254);
-  --primary-foreground: oklch(0.99 0.005 264);
-  --primary-muted: oklch(0.62 0.187 254 / 0.14);
+  /* Cleaner cobalt-azure primary (less violet than before) */
+  --primary: oklch(0.62 0.198 258);
+  --primary-foreground: oklch(0.99 0.005 258);
+  --primary-muted: oklch(0.62 0.198 258 / 0.15);
 
-  --secondary: oklch(0.26 0.016 264);
-  --secondary-foreground: oklch(0.96 0.004 264);
+  --secondary: oklch(0.252 0.009 258);
+  --secondary-foreground: oklch(0.965 0.004 258);
 
-  --muted: oklch(0.24 0.014 264);
-  --muted-foreground: oklch(0.685 0.02 264);
+  --muted: oklch(0.232 0.008 258);
+  --muted-foreground: oklch(0.7 0.014 258);
 
-  --accent: oklch(0.28 0.02 264);
-  --accent-foreground: oklch(0.97 0.004 264);
+  --accent: oklch(0.275 0.011 258);
+  --accent-foreground: oklch(0.975 0.004 258);
 
-  --destructive: oklch(0.62 0.21 20);
+  --destructive: oklch(0.63 0.21 22);
 
-  --positive: oklch(0.74 0.16 158);
-  --positive-foreground: oklch(0.16 0.012 264);
-  --positive-muted: oklch(0.74 0.16 158 / 0.14);
+  /* Refined jewel tones for gains / losses */
+  --positive: oklch(0.78 0.15 164);
+  --positive-foreground: oklch(0.145 0.006 258);
+  --positive-muted: oklch(0.78 0.15 164 / 0.15);
 
-  --negative: oklch(0.68 0.19 18);
-  --negative-foreground: oklch(0.99 0.005 264);
-  --negative-muted: oklch(0.68 0.19 18 / 0.14);
+  --negative: oklch(0.665 0.2 20);
+  --negative-foreground: oklch(0.99 0.005 258);
+  --negative-muted: oklch(0.665 0.2 20 / 0.15);
 
-  --warning: oklch(0.82 0.14 78);
-  --warning-muted: oklch(0.82 0.14 78 / 0.14);
+  --warning: oklch(0.84 0.13 84);
+  --warning-muted: oklch(0.84 0.13 84 / 0.15);
 
   --border: oklch(1 0 0 / 8%);
-  --border-strong: oklch(1 0 0 / 14%);
+  --border-strong: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.62 0.187 254);
+  --ring: oklch(0.62 0.198 258);
 
-  --chart-1: oklch(0.62 0.187 254);
-  --chart-2: oklch(0.74 0.16 158);
-  --chart-3: oklch(0.82 0.14 78);
-  --chart-4: oklch(0.7 0.15 300);
-  --chart-5: oklch(0.68 0.19 18);
+  --chart-1: oklch(0.62 0.198 258);
+  --chart-2: oklch(0.78 0.15 164);
+  --chart-3: oklch(0.84 0.13 84);
+  --chart-4: oklch(0.72 0.15 300);
+  --chart-5: oklch(0.665 0.2 20);
 
-  --sidebar: oklch(0.175 0.013 264);
-  --sidebar-foreground: oklch(0.97 0.004 264);
+  --sidebar: oklch(0.162 0.007 258);
+  --sidebar-foreground: oklch(0.975 0.004 258);
   --sidebar-border: oklch(1 0 0 / 7%);
 }
 
@@ -115,8 +118,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   /* Financial figures should always be tabular */
   .tabular {
