@@ -188,7 +188,7 @@ export function PortfolioView() {
             </div>
           </Panel>
           <Button onClick={() => openAdd()} className="w-full gap-1.5 rounded-xl font-semibold">
-            <Plus className="size-4" strokeWidth={2.5} /> Add position
+            <Plus className="size-4" strokeWidth={2.5} /> Add to collection
           </Button>
         </div>
       </div>
@@ -304,7 +304,7 @@ function PositionRow({
         <button
           onClick={onEdit}
           className="flex size-7 items-center justify-center rounded-md bg-secondary text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="Edit position"
+          aria-label="Edit holding"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -345,7 +345,7 @@ function EmptyState({ onAdd, query }: { onAdd: () => void; query: string }) {
       </div>
       {!query && (
         <Button onClick={onAdd} size="sm" className="mt-1 gap-1.5 rounded-xl font-semibold">
-          <Plus className="size-4" strokeWidth={2.5} /> Add position
+          <Plus className="size-4" strokeWidth={2.5} /> Add to collection
         </Button>
       )}
     </div>

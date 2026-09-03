@@ -78,7 +78,7 @@ export function AddPositionModal() {
       grade: selected.grades ? grade : undefined,
     })
     toast({
-      title: 'Position added',
+      title: 'Added to collection',
       description: `${nQty}× ${selected.name} at ${formatUSD(nPrice, { cents: true })}`,
       variant: 'positive',
     })
@@ -93,7 +93,7 @@ export function AddPositionModal() {
       <div className="relative flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-border-strong bg-popover shadow-2xl sm:rounded-2xl">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-base font-bold text-foreground">Add position</h2>
+            <h2 className="text-base font-bold text-foreground">Add to collection</h2>
             <p className="text-xs text-muted-foreground">Track a new card or sealed product</p>
           </div>
           <button
@@ -232,7 +232,7 @@ export function AddPositionModal() {
               {/* result preview */}
               <div className="rounded-xl border border-border bg-card p-4">
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Resulting position
+                  Resulting holding
                 </p>
                 <dl className="grid grid-cols-2 gap-y-2.5 text-sm">
                   <Row label="Cost basis" value={formatUSD(costBasis, { cents: true })} />
@@ -255,7 +255,7 @@ export function AddPositionModal() {
           </Button>
           <Button onClick={submit} disabled={!canSubmit} className="flex-1 gap-1.5 rounded-xl font-semibold">
             <Check className="size-4" strokeWidth={2.5} />
-            Add to portfolio
+            Add to collection
           </Button>
         </div>
       </div>

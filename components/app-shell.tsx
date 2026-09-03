@@ -15,11 +15,12 @@ import {
   Search,
   Plus,
   Command,
+  Medal,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useUI } from '@/lib/ui'
 import { usePortfolio } from '@/lib/store'
-import { formatUSD, formatPct, trendClass } from '@/lib/format'
+import { getTier } from '@/lib/gamify'
 import { cn } from '@/lib/utils'
 
 const PRIMARY_NAV = [
@@ -64,6 +65,7 @@ function isActive(pathname: string, href: string) {
 function Sidebar() {
   const pathname = usePathname()
   const { totals } = usePortfolio()
+  const tier = getTier(totals.value)
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
       <div className="flex h-16 items-center px-5">
@@ -115,17 +117,30 @@ function Sidebar() {
 
       <div className="border-t border-sidebar-border p-3">
         <Link
-          href="/portfolio"
+          href="/"
           className="block rounded-xl border border-border bg-card p-3 transition-colors hover:border-border-strong"
         >
-          <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Portfolio value
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-warning-muted text-warning">
+              <Medal className="size-[18px]" strokeWidth={2.2} />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Collector rank
+              </div>
+              <div className="truncate text-sm font-bold text-foreground">{tier.current.name}</div>
+            </div>
           </div>
-          <div className="tabular mt-1 text-lg font-bold text-foreground">
-            {formatUSD(totals.value)}
+          <div className="mt-2.5 flex items-center justify-between text-[11px] font-medium">
+            <span className="text-muted-foreground">
+              {tier.next ? `${Math.round(tier.progress * 100)}% to ${tier.next.name}` : 'Max tier reached'}
+            </span>
           </div>
-          <div className={cn('tabular text-xs font-semibold', trendClass(totals.totalReturnPct))}>
-            {formatPct(totals.totalReturnPct)} all time
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-500"
+              style={{ width: `${Math.max(6, tier.progress * 100)}%` }}
+            />
           </div>
         </Link>
       </div>
@@ -159,7 +174,7 @@ function Topbar() {
         <div className="ml-auto flex items-center gap-2">
           <Button onClick={() => openAdd()} size="sm" className="h-10 gap-1.5 rounded-xl font-semibold">
             <Plus className="size-4" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Add position</span>
+            <span className="hidden sm:inline">Add to collection</span>
             <span className="sm:hidden">Add</span>
           </Button>
         </div>

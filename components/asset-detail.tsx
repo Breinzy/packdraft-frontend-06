@@ -121,7 +121,7 @@ export function AssetDetail({ assetId }: { assetId: string }) {
 
             <div className="mt-4 flex gap-2">
               <Button onClick={() => openAdd(asset.id)} className="flex-1 gap-1.5 rounded-xl font-semibold">
-                <Plus className="size-4" strokeWidth={2.5} /> Add to portfolio
+                <Plus className="size-4" strokeWidth={2.5} /> Add to collection
               </Button>
               <WatchButton assetId={asset.id} />
             </div>
