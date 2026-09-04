@@ -59,6 +59,17 @@ const sizeMap = {
   xl: 'h-full w-full text-5xl rounded-2xl',
 }
 
+function assetInitials(name: string) {
+  return name
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+}
+
 export function AssetToken({
   asset,
   size = 'md',
@@ -69,14 +80,7 @@ export function AssetToken({
   className?: string
 }) {
   const color = ENERGY_COLOR[asset.energy]
-  const initials = asset.name
-    .replace(/[^a-zA-Z0-9 ]/g, '')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
+  const initials = assetInitials(asset.name)
   return (
     <div
       className={cn(
@@ -104,6 +108,66 @@ export function AssetToken({
           Sealed
         </span>
       )}
+    </div>
+  )
+}
+
+/* ---------- AssetHero: large centered card-shaped visual on a soft glow ---------- */
+
+export function AssetHero({
+  asset,
+  className,
+  children,
+}: {
+  asset: Pick<Asset, 'name' | 'energy' | 'type'>
+  className?: string
+  children?: React.ReactNode
+}) {
+  const color = ENERGY_COLOR[asset.energy]
+  const initials = assetInitials(asset.name)
+  return (
+    <div
+      className={cn(
+        'relative flex items-center justify-center overflow-hidden px-6 py-7',
+        className,
+      )}
+    >
+      {/* backdrop glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(58% 52% at 50% 38%, ${color.replace(')', ' / 0.3)')}, transparent 72%)`,
+        }}
+      />
+      {/* card */}
+      <div
+        aria-hidden
+        className="relative flex aspect-[5/7] w-[190px] max-w-[62%] items-center justify-center rounded-2xl border border-border-strong shadow-2xl sm:w-[210px] sm:max-w-none"
+        style={{
+          background: `radial-gradient(125% 120% at 30% 0%, ${color.replace(')', ' / 0.42)')}, var(--card-elevated) 60%)`,
+          color,
+        }}
+      >
+        <span
+          className="absolute inset-x-0 top-0 h-px opacity-70"
+          style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
+        />
+        <span
+          className={cn(
+            'font-bold leading-none tracking-tight',
+            asset.type === 'sealed' ? 'text-3xl uppercase' : 'text-5xl',
+          )}
+        >
+          {initials}
+        </span>
+        {asset.type === 'sealed' && (
+          <span className="absolute bottom-3 rounded bg-background/40 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-foreground/80">
+            Sealed
+          </span>
+        )}
+      </div>
+      {children}
     </div>
   )
 }

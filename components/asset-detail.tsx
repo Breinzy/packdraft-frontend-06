@@ -9,7 +9,7 @@ import { usePortfolio } from '@/lib/store'
 import { useUI } from '@/lib/ui'
 import { PriceChart } from '@/components/charts'
 import { WatchButton, AssetRow } from '@/components/asset-views'
-import { AssetToken, ChangeBadge, Panel, SectionHead, TypePill } from '@/components/primitives'
+import { AssetHero, ChangeBadge, Panel, SectionHead, TypePill } from '@/components/primitives'
 import { formatUSD, formatSignedUSD, formatPct, formatDate, formatCompactNumber, trendClass } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +35,9 @@ export function AssetDetail({ assetId }: { assetId: string }) {
   const owned = ownedFor(asset.id)
   const activeGrade = asset.grades?.find((g) => g.grade === grade)
   const shownPrice = activeGrade?.price ?? asset.price
-  const shownChange = activeGrade ? activeGrade.change : asset.change24h
+  // raw grade carries no independent change; fall back to the asset's 24h move
+  const shownChange =
+    activeGrade && grade !== 'raw' && activeGrade.change !== 0 ? activeGrade.change : asset.change24h
   const exposure = totals.value > 0 && owned ? (owned.marketValue / totals.value) * 100 : 0
 
   const history = useMemo(() => {
@@ -46,97 +48,104 @@ export function AssetDetail({ assetId }: { assetId: string }) {
 
   return (
     <div className="space-y-5">
-      <Link
-        href="/market"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Market
-      </Link>
+      {/* Top bar */}
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/market"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" /> Market
+        </Link>
+        <WatchButton assetId={asset.id} />
+      </div>
 
-      {/* HEADER */}
-      <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
-        {/* Image / token */}
-        <Panel padded={false} className="overflow-hidden">
-          <div className="aspect-[3/4] max-h-80 w-full lg:max-h-none">
-            <AssetToken asset={asset} size="xl" className="rounded-none border-0" />
-          </div>
-          <div className="flex items-center justify-between gap-2 border-t border-border p-3">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="tabular">{formatCompactNumber(asset.watchers)} watching</span>
-              <span>·</span>
-              <span className="tabular">Vol {formatCompactNumber(asset.volume)}</span>
-            </div>
-            <WatchButton assetId={asset.id} />
-          </div>
-        </Panel>
+      {/* AT A GLANCE: image · price · chart */}
+      <div className="grid gap-5 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start">
+        {/* Card hero */}
+        <AssetHero
+          asset={asset}
+          className="rounded-2xl border border-border bg-card lg:sticky lg:top-5"
+        />
 
-        <div className="flex flex-col gap-5">
-          <Panel>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <TypePill type={asset.type} />
-                  <Link href={`/sets/${asset.setId}`} className="text-xs font-medium text-muted-foreground hover:text-primary">
-                    {asset.setName}
-                  </Link>
-                  <span className="text-xs text-muted-foreground">· {asset.tag}</span>
-                </div>
-                <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground text-balance sm:text-3xl">
-                  {asset.name}
-                </h1>
-                <p className="mt-0.5 text-sm text-muted-foreground">{asset.subtitle}</p>
+        <div className="flex flex-col gap-4">
+          {/* Identity + price */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <TypePill type={asset.type} />
+                <Link
+                  href={`/sets/${asset.setId}`}
+                  className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {asset.setName}
+                </Link>
               </div>
-              <div className="text-right">
-                <p className="tabular text-3xl font-bold tracking-tight text-foreground">
-                  {formatUSD(shownPrice, { cents: true })}
-                </p>
-                <div className="mt-1 flex justify-end">
-                  <ChangeBadge value={shownChange} size="md" />
-                </div>
+              <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-foreground text-balance sm:text-3xl">
+                {asset.name}
+              </h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {asset.subtitle} · {asset.tag}
+              </p>
+            </div>
+            <div className="shrink-0 text-right">
+              <p className="tabular text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {formatUSD(shownPrice, { cents: true })}
+              </p>
+              <div className="mt-1 flex justify-end">
+                <ChangeBadge value={shownChange} size="md" />
               </div>
             </div>
+          </div>
 
-            {/* Grade selector */}
-            {asset.grades && (
-              <div className="mt-4 grid grid-cols-4 gap-1.5">
-                {asset.grades.map((g) => (
+          {/* Grade segmented control */}
+          {asset.grades && (
+            <div className="grid grid-cols-4 gap-1 rounded-xl border border-border bg-secondary/50 p-1">
+              {asset.grades.map((g) => {
+                const sel = grade === g.grade
+                return (
                   <button
                     key={g.grade}
                     onClick={() => setGrade(g.grade)}
                     className={cn(
-                      'rounded-xl border p-2.5 text-left transition-colors',
-                      grade === g.grade
-                        ? 'border-primary bg-primary-muted'
-                        : 'border-border bg-card hover:border-border-strong',
+                      'rounded-lg px-1 py-1.5 text-center transition-colors',
+                      sel ? 'bg-card-elevated shadow-sm' : 'hover:bg-card/60',
                     )}
                   >
-                    <span className="block text-[11px] font-semibold text-muted-foreground">
+                    <span
+                      className={cn(
+                        'block text-[10px] font-bold uppercase tracking-wide',
+                        sel ? 'text-foreground' : 'text-muted-foreground',
+                      )}
+                    >
                       {g.grade === 'raw' ? 'Raw' : g.grade.toUpperCase().replace('PSA', 'PSA ')}
                     </span>
-                    <span className="tabular block text-sm font-bold text-foreground">{formatUSD(g.price)}</span>
+                    <span
+                      className={cn(
+                        'tabular mt-0.5 block text-xs font-semibold',
+                        sel ? 'text-foreground' : 'text-muted-foreground/70',
+                      )}
+                    >
+                      {formatUSD(g.price)}
+                    </span>
                   </button>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4 flex gap-2">
-              <Button onClick={() => openAdd(asset.id)} className="flex-1 gap-1.5 rounded-xl font-semibold">
-                <Plus className="size-4" strokeWidth={2.5} /> Add to collection
-              </Button>
-              <WatchButton assetId={asset.id} />
+                )
+              })}
             </div>
-          </Panel>
+          )}
 
           {/* Chart */}
-          <Panel>
-            <div className="mb-1 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-foreground">Price history</h2>
-              <span className="tabular text-xs text-muted-foreground">
-                {grade !== 'raw' && asset.grades ? grade.toUpperCase() : 'Market'}
-              </span>
-            </div>
-            <PriceChart history={history} defaultRange="3M" height={220} />
-          </Panel>
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+            <PriceChart history={history} defaultRange="3M" height={200} />
+          </div>
+
+          {/* Primary action */}
+          <Button
+            onClick={() => openAdd(asset.id)}
+            size="lg"
+            className="h-12 w-full gap-1.5 rounded-xl font-semibold"
+          >
+            <Plus className="size-4" strokeWidth={2.5} /> Add to collection
+          </Button>
         </div>
       </div>
 
@@ -161,10 +170,12 @@ export function AssetDetail({ assetId }: { assetId: string }) {
       )}
 
       {/* Market stats */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <MetricTile label="24h change" value={formatPct(asset.change24h)} valueClass={trendClass(asset.change24h)} />
         <MetricTile label="7d change" value={formatPct(asset.change7d)} valueClass={trendClass(asset.change7d)} />
         <MetricTile label="30d change" value={formatPct(asset.change30d)} valueClass={trendClass(asset.change30d)} />
+        <MetricTile label="Volume" value={formatCompactNumber(asset.volume)} />
+        <MetricTile label="Watchers" value={formatCompactNumber(asset.watchers)} />
         <MetricTile label="Released" value={formatDate(asset.releasedAt)} />
       </div>
 
