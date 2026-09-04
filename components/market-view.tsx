@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { Search, Flame, TrendingUp, TrendingDown, Eye, Sparkles } from 'lucide-react'
+import { Search, Flame, TrendingUp, TrendingDown, Eye, Sparkles, Star } from 'lucide-react'
 import { assets, sets } from '@/lib/data'
 import { useUI } from '@/lib/ui'
 import { AssetCard, AssetRow } from '@/components/asset-views'
@@ -55,14 +55,25 @@ export function MarketView() {
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <button
-        onClick={openSearch}
-        className="flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-left text-sm text-muted-foreground transition-colors hover:border-border-strong hover:bg-card-elevated"
-      >
-        <Search className="size-4.5" />
-        <span className="flex-1">Search &ldquo;Charizard&rdquo;, &ldquo;Prismatic Evolutions&rdquo;, &ldquo;Booster Box&rdquo;...</span>
-        <span className="hidden rounded-lg bg-secondary px-2 py-1 text-xs font-semibold sm:inline">Search</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={openSearch}
+          className="flex h-12 flex-1 items-center gap-3 rounded-2xl border border-border bg-card px-4 text-left text-sm text-muted-foreground transition-colors hover:border-border-strong hover:bg-card-elevated"
+        >
+          <Search className="size-4.5" />
+          <span className="flex-1 truncate">
+            Search &ldquo;Charizard&rdquo;, &ldquo;Prismatic Evolutions&rdquo;, &ldquo;Booster Box&rdquo;...
+          </span>
+          <span className="hidden rounded-lg bg-secondary px-2 py-1 text-xs font-semibold sm:inline">Search</span>
+        </button>
+        <Link
+          href="/watchlist"
+          className="flex h-12 shrink-0 items-center gap-1.5 rounded-2xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground transition-colors hover:border-border-strong hover:bg-card-elevated sm:px-4"
+        >
+          <Star className="size-4.5 text-warning" strokeWidth={2.2} />
+          <span className="hidden sm:inline">Watchlist</span>
+        </Link>
+      </div>
 
       {/* Filter + rail selectors */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

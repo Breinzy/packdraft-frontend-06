@@ -8,9 +8,7 @@ import {
   TrendingUp,
   Star,
   Layers,
-  Trophy,
-  Target,
-  FlaskConical,
+  Gamepad2,
   Sparkles,
   Search,
   Plus,
@@ -28,13 +26,13 @@ const PRIMARY_NAV = [
   { href: '/sets', label: 'Sets', icon: Layers },
 ]
 
-const FUTURE_NAV = [
-  { label: 'Tournaments', icon: Trophy },
-  { label: 'Predictions', icon: Target },
-  { label: 'Sandbox', icon: FlaskConical },
+const MOBILE_NAV = [
+  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/portfolio', label: 'Portfolio', icon: Wallet },
+  { href: '/market', label: 'Market', icon: TrendingUp },
+  { href: '/sets', label: 'Sets', icon: Layers },
+  { href: '/play', label: 'Play', icon: Gamepad2 },
 ]
-
-const MOBILE_NAV = PRIMARY_NAV
 
 function Logo({ compact }: { compact?: boolean }) {
   return (
@@ -107,24 +105,23 @@ function Sidebar() {
           </Link>
         </div>
 
-        <div className="mt-6 px-3">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
-            Coming soon
-          </span>
+        <div className="mt-2">
+          <Link
+            href="/play"
+            className={cn(
+              'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              isActive(pathname, '/play')
+                ? 'bg-primary-muted text-primary'
+                : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+            )}
+          >
+            <Gamepad2 className="size-[18px]" strokeWidth={isActive(pathname, '/play') ? 2.4 : 2} />
+            Play
+            <span className="ml-auto rounded bg-secondary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted-foreground/70">
+              Soon
+            </span>
+          </Link>
         </div>
-        <ul className="mt-2 flex flex-col gap-0.5">
-          {FUTURE_NAV.map((item) => (
-            <li key={item.label}>
-              <div className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground/45">
-                <item.icon className="size-[18px]" strokeWidth={2} />
-                {item.label}
-                <span className="ml-auto rounded bg-secondary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted-foreground/70">
-                  Soon
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
