@@ -90,11 +90,12 @@ function PositionViz() {
 
 function OpportunityViz() {
   const rows = [
-    { name: 'Espeon ex', energy: 'psychic' as const, reason: 'Undervalued vs set' },
-    { name: 'Destined Rivals BB', energy: 'fire' as const, reason: 'Volume spike' },
+    { name: 'Espeon ex', energy: 'psychic' as const, reason: 'Completes your Eeveelution set' },
+    { name: 'Destined Rivals BB', energy: 'fire' as const, reason: 'Matches your sealed strategy' },
   ]
   return (
     <div className="space-y-2">
+      <p className="text-[11px] font-medium text-muted-foreground">Picked for your collection</p>
       {rows.map((r) => (
         <div
           key={r.name}
@@ -181,7 +182,9 @@ const PLAN_INCLUDES = [
 
 export function ProView() {
   const [annual, setAnnual] = useState(true)
-  const price = annual ? 15 : 19
+  const MONTHLY = 10
+  const ANNUAL_TOTAL = 99
+  const price = annual ? (ANNUAL_TOTAL / 12).toFixed(2) : MONTHLY.toFixed(0)
 
   return (
     <div className="space-y-8">
@@ -211,7 +214,8 @@ export function ProView() {
                 Upgrade to Pro
               </Button>
               <span className="text-sm text-muted-foreground">
-                From <span className="tabular font-semibold text-foreground">${price}/mo</span> · cancel anytime
+                <span className="tabular font-semibold text-foreground">${MONTHLY}/mo</span> · $
+                {ANNUAL_TOTAL}/yr · cancel anytime
               </span>
             </div>
           </div>
@@ -256,7 +260,7 @@ export function ProView() {
           <FeatureCard
             icon={Compass}
             title="Opportunity Intelligence"
-            description="Surface assets and listings worth researching before the rest of the market."
+            description="Surface assets and listings worth researching, tailored to your collection and the way you invest."
             className="lg:col-span-2"
           >
             <OpportunityViz />
@@ -315,7 +319,7 @@ export function ProView() {
               >
                 Annual
                 <span className="rounded bg-positive-muted px-1 py-0.5 text-[9px] font-bold uppercase text-positive">
-                  -21%
+                  -17%
                 </span>
               </button>
             </div>
@@ -325,7 +329,7 @@ export function ProView() {
               <span className="text-sm text-muted-foreground">/ month</span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              {annual ? 'Billed annually at $180' : 'Billed monthly'}
+              {annual ? `Billed annually at $${ANNUAL_TOTAL}` : 'Billed monthly'}
             </p>
 
             <Button size="lg" className="mt-5 h-11 w-full gap-1.5 rounded-xl font-semibold">
