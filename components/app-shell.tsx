@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Star,
   Layers,
-  Gamepad2,
+  Trophy,
   Sparkles,
   Search,
   Plus,
@@ -31,7 +31,7 @@ const MOBILE_NAV = [
   { href: '/portfolio', label: 'Portfolio', icon: Wallet },
   { href: '/market', label: 'Market', icon: TrendingUp },
   { href: '/sets', label: 'Sets', icon: Layers },
-  { href: '/play', label: 'Play', icon: Gamepad2 },
+  { href: '/play', label: 'Play', icon: Trophy },
 ]
 
 function Logo({ compact }: { compact?: boolean }) {
@@ -115,7 +115,7 @@ function Sidebar() {
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
             )}
           >
-            <Gamepad2 className="size-[18px]" strokeWidth={isActive(pathname, '/play') ? 2.4 : 2} />
+            <Trophy className="size-[18px]" strokeWidth={isActive(pathname, '/play') ? 2.4 : 2} />
             Play
             <span className="ml-auto rounded bg-secondary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted-foreground/70">
               Soon
